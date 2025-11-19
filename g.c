@@ -3,7 +3,7 @@
 #include <string.h>
 
 /*
- *  g - the git wrapper
+ *  g - the *wrapper* git wrapper
  *      $version_number
  */
 
@@ -14,12 +14,33 @@
 //                             dd  -> day
 //                             vvv -> continous version number
 const char version_number[] = "11-20.001";
+
 const char red[] = "\033[31m";
 const char def[] = "\033[0m";
 
 char strn1[2048]; // arg buffer 1
 char strn2[2048]; // arg buffer 2
+char strn3[2048]; // arg buffer 3
+char strn4[2048]; // arg buffer 4
 
+const char *init_vars[] = {"i", "I", "in", "ini", "init", NULL};
+const char *status_vars[] = {"s", "S", "st", "sta", "stat", "statu", "status", NULL};
+const char *diff_vars[] = {"d", "D", "di", "dif", "diff", NULL};
+const char *commit_vars[] = {"c", "C", "co", "com", "comm", "commi", "commit", NULL};
+const char *fetch_vars[] = {"f", "F", "fe", "fet", "fetc", "fetch", NULL};
+const char *merge_vars[] = {"m", "M", "me", "mer", "merg", "merge", NULL};
+const char *push_vars[] = {"p", "P", "pu", "pus", "push", NULL};
+const char *pull_vars[] = {"pl", "Pl", "pL", "PL", "pul", "pull", NULL};
+const char *help_vars[] = {"h", "H", "he", "hel", "help", "-h", "--help", NULL};
+const char *log_vars[] = {"l", "L", "lo", "log", NULL};
+const char *stash_vars[] = {"st", "St", "sT", "ST", "sta", "stas", "stash", NULL};
+
+const char *diff_staged_vars[] = {"s", "S", "st", "sta", "stag", "stage", "staged", "--staged", NULL};
+const char *commit_add_vars[] = {"a", "A", "ad", "add", NULL};
+const char *commit_message_vars[] = {"m", "M", "ms", "msg", NULL};
+const char *push_upstream_vars[] = {"u", "U", "up", "ups", "upst", "upstr", "upstre", "upstrea", "upstream", "--set-upstream", NULL};
+
+int matches(const char *cmd, const char *list[]);
 void usage();
 
 int main(int argc, char **argv) {
@@ -33,52 +54,100 @@ int main(int argc, char **argv) {
      *  sorry but this is the best implementation
      *  you'll get out of an eepy ass at almost 2AM
      */
-    if (argc == 2) {
+    if (argc == 2) {                                       // g x
         strcpy(strn1, argv[1]);
-        if (strcmp(strn1, "i") == 0 || strcmp(strn1, "ini") == 0 ||
-            strcmp(strn1, "in") == 0 || strcmp(strn1, "init") == 0) {
+
+        if (matches(strn1, init_vars) == 0) {
             system("git init");
             return 0;
-        } else if (strcmp(strn1, "s") == 0 || strcmp(strn1, "stat") == 0 ||
-                   strcmp(strn1, "st") == 0 || strcmp(strn1, "statu") == 0 ||
-                   strcmp(strn1, "sta") == 0 || strcmp(strn1, "status") == 0) {
+        }
+        else if (matches(strn1, status_vars) == 0) {
             system("git status");
             return 0;
-        } else if (strcmp(strn1, "d") == 0 || strcmp(strn1, "dif") == 0 ||
-                   strcmp(strn1, "di") == 0 || strcmp(strn1, "diff") == 0) {
+        }
+        else if (matches(strn1, diff_vars) == 0) {
             system("git diff");
             return 0;
-        } else if (strcmp(strn1, "c") == 0 || strcmp(strn1, "comm") == 0 ||
-                   strcmp(strn1, "co") == 0 || strcmp(strn1, "commi") == 0 ||
-                   strcmp(strn1, "com") == 0 || strcmp(strn1, "commit") == 0) {
+        }
+        else if (matches(strn1, commit_vars) == 0) {
             system("git commit");
             return 0;
-        } else if (strcmp(strn1, "f") == 0 || strcmp(strn1, "fetc") == 0 || 
-                   strcmp(strn1, "fe") == 0 || strcmp(strn1, "fetch") == 0 ||
-                   strcmp(strn1, "fet") == 0) {
+        }
+        else if (matches(strn1, fetch_vars) == 0) {
             system("git fetch");
-        } else if (strcmp(strn1, "p") == 0 || strcmp(strn1, "pus") == 0 ||
-                   strcmp(strn1, "pu") == 0 || strcmp(strn1, "push") == 0) {
-            system("git push");
-        } else if (strcmp(strn1, "m") == 0 || strcmp(strn1, "merg") == 0 ||
-                   strcmp(strn1, "me") == 0 || strcmp(strn1, "merge") == 0 ||
-                   strcmp(strn1, "mer") == 0) {
+            return 0;
+        }
+        else if (matches(strn1, merge_vars) == 0) {
             system("git merge");
-        } else if (strcmp(strn1, "h") == 0 || strcmp(strn1, "hel") == 0 ||
-                   strcmp(strn1, "he") == 0 || strcmp(strn1, "help") == 0) {
+            return 0;
+        }
+        else if (matches(strn1, push_vars) == 0) {
+            system("git push");
+            return 0;
+        }
+        else if (matches(strn1, pull_vars) == 0) {
+            system("git pull");
+            return 0;
+        }
+        else if (matches(strn1, log_vars) == 0) {
+            system("git log");
+            return 0;
+        }
+        else if (matches(strn1, stash_vars) == 0) {
+            system("git stash");
+        }
+        else if (matches(strn1, help_vars) == 0) {
             usage();
             return 0;
         }
-                   
+    } else if (argc == 3) {                                // g x y
+        strcpy(strn1, argv[1]);
+        strcpy(strn2, argv[2]);
+
+        if (matches(strn1, init_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                system("git init");
+                return 0;
+            } else if (strlen(strn2) > 0) {
+                char command_buffer[4096] = "git init ";
+                strcat(command_buffer, strn2); // TODO: use snprintf or anything safer than strcat()
+                system(command_buffer);
+            }
+        } else if (matches(strn1, diff_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                system("git diff");
+                return 0;
+            } else if (strlen(strn2) > 0) {
+                if (matches(strn2, diff_staged_vars) == 0) {
+                    system("git diff --staged");
+                    return 0;
+                } else {
+                    printf(":: %sunknown%s option for '%sd%s': %s%s%s\n", red, def, red, def, red, strn2, def);
+                    printf(":: running '%sgit diff --staged%s'\n", red, def);
+                    system("git diff --staged");
+                    return 0;
+                }
+            }
+        }
     }
 
     usage();
     return 0;
 }
 
+int matches(const char *cmd, const char *list[]) {
+    for (int i = 0; list[i] != NULL; i++) {
+        if (strcmp(cmd, list[i]) == 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+
 void usage() {
     printf(
-        "%sg%s - the %sgit%s wrapper\n"
+        "%sg%s - the %spermissive%s git wrapper\n"
         "spinning version %s%s%s\n"
         "==============================================================\n"
         "generally: 'g [%sstuff%s]', got it?\n"
@@ -89,7 +158,7 @@ void usage() {
        "g %si%s [path]                     -> git %si%snit [path]\n"
 
        "g %ss%s                            -> git %ss%status\n"
-       "g %sd%s [s] [commit1 commit2]      -> git %sd%siff [--staged] [commit1 commit2]\n"
+       "g %sd%s [s] [commit1 [commit2]]    -> git %sd%siff [--staged] [commit1 [commit2]]\n"
        "g %sc%s [a] [m {\"msg\"}]            -> git %sc%sommit [-a] [-m {\"msg\"}]\n"
        "g %sf%s [remote [branch]]          -> git %sf%setch [remote [branch]]\n"
        "g %sm%s [branch]                   -> git %sm%serge [branch]\n"
@@ -107,6 +176,7 @@ void usage() {
        "g %sre%s [s] {file}                -> git %sre%sstore [--staged] {file}\n"
        "g %srt%s [s|m|h] {commit}          -> git %sr%sese%st%s [--soft|--mixed|--hard] {commit}\n"
        "g %srv%s {commit}                  -> git %sr%se%sv%sert {commit}\n"
+       "g %sr%s {a{name{url}}|g{name}}     -> git %sr%semote {add{name{url}}|get-url{name}}\n"
        "g %ssh%s {commit}                  -> git %ssh%sow {commit}\n"
        "g %st%s [a] {name} [m {\"msg\"}]     -> git %st%sag [-a] {name} [-m {\"msg\"}]\n"
         , red, def, red, def
@@ -130,11 +200,12 @@ void usage() {
         , red, def, red, def
         , red, def, red, def
         , red, def, red, def
+        , red, def, red, def
         , red, def, red, def, red, def 
         , red, def, red, def
         , red, def, red, def, red, def 
         , red, def, red, def, red, def 
-        , red, def, red, def
         , red, def, red, def
     );
 }
+
