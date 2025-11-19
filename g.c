@@ -111,7 +111,8 @@ int main(int argc, char **argv) {
             } else if (strlen(strn2) > 0) {
                 char command_buffer[4096] = "git init ";
                 strcat(command_buffer, strn2); // TODO: use snprintf or anything safer than strcat()
-                system(command_buffer);
+                system(command_buffer); // git init [path]
+                return 0;
             }
         } else if (matches(strn1, diff_vars) == 0) {
             if (strlen(strn2) == 0) {
@@ -125,6 +126,51 @@ int main(int argc, char **argv) {
                     printf(":: %sunknown%s option for '%sd%s': %s%s%s\n", red, def, red, def, red, strn2, def);
                     printf(":: running '%sgit diff --staged%s'\n", red, def);
                     system("git diff --staged");
+                    return 0;
+                }
+            }
+        } else if (matches(strn1, commit_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                system("git commit");
+                return 0;
+            } else if (strlen(strn2) > 0) {
+                if (matches(strn2, commit_add_vars) == 0) {
+                    system("git commit -a");
+                    return 0;
+                } // the commit_message_vars check is in the argc == 4, because it demands another argument too
+            }
+        } else if (matches(strn1, fetch_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                system("git fetch");
+                return 0;
+            } else if (strlen(strn2) > 0) {
+                char command_buffer[4096] = "git fetch ";
+                strcat(command_buffer, strn2);
+                system(command_buffer); // git fetch [remote]
+                return 0;
+            }
+        } else if (matches(strn1, merge_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                system("git merge");
+                return 0;
+            } else if (strlen(strn2) > 0) {
+                char command_buffer[4096] = "git merge ";
+                strcat(command_buffer, strn2);
+                system(command_buffer); // git merge [branch]
+                return 0;
+            }
+        } else if (matches(strn1, push_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                system("git push");
+                return 0;
+            } else if (strlen(strn2) > 0) {
+                if (matches(strn2, push_upstream_vars) == 0) {
+                    system("git push --upstream");
+                    return 0;
+                } else {
+                    char command_buffer[4096] = "git push ";
+                    strcat(command_buffer, strn2);
+                    system(command_buffer); // git push [remote]
                     return 0;
                 }
             }
@@ -151,8 +197,7 @@ void usage() {
         "spinning version %s%s%s\n"
         "==============================================================\n"
         "generally: 'g [%sstuff%s]', got it?\n"
-        "[] -> %soptional%s\n"
-        "{} -> %srequired%s\n"
+        "[] -> %soptional%s | {} -> %srequired%s\n"
         "==============================================================\n"
         "stuff;\n"
        "g %si%s [path]                     -> git %si%snit [path]\n"
