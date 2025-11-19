@@ -6,4 +6,4 @@ boooooooring commands like `git commit -a -m "fuck"`.
 
 ## get `g`
 to get `g` you can either build it yourself or you \
-can install the AUR package `g-bin`.
+can install the AUR package `getg`.
