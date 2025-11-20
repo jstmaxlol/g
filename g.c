@@ -34,11 +34,35 @@ const char *pull_vars[] = {"pl", "Pl", "pL", "PL", "pul", "pull", NULL};
 const char *help_vars[] = {"h", "H", "he", "hel", "help", "-h", "--help", NULL};
 const char *log_vars[] = {"l", "L", "lo", "log", NULL};
 const char *stash_vars[] = {"st", "St", "sT", "ST", "sta", "stas", "stash", NULL};
+const char *clone_vars[] = {"g", "G", "cl", "clo", "clon", "clone", NULL};
+const char *add_vars[] = {"a", "A", "ad", "add", NULL};
+const char *branch_vars[] = {"b", "B", "br", "bra", "bran", "branc", "branch", NULL};
+const char *switch_vars[] = {"sw", "Sw", "sW", "SW", "swi", "swit", "switc", "switch", NULL};
+const char *checkout_vars[] = {"co", "Co", "cO", "CO", "ch", "che", "chec", "check", "checko", "checkou", "checkout", NULL};
+const char *restore_vars[] = {"re", "Re", "rE", "RE", "res", "rest", "resto", "restor", "restore", NULL};
+const char *reset_vars[] = {"rt", "Rt", "rT", "RT", "rese", "reset", NULL}; // excluded 're' and 'res'
+const char *revert_vars[] = {"rv", "Rv", "rV", "RV", "re", "rev", "reve", "rever", "revert", NULL};
+const char *remote_vars[] = {"r", "R", "r", "rem", "remo", "remot", "remote", NULL}; // excluded "re"
+const char *show_vars[] = {"sh", "Sh", "sH", "SH", "sho", "show", NULL};
+const char *rm_vars[] = {"rm", "Rm", "rM", "RM", "remov", "remove", NULL}; // excluded "re", "rem" and "remo"
+const char *tag_vars[] = {"t", "T", "ta", "tag", NULL};
 
-const char *diff_staged_vars[] = {"s", "S", "st", "sta", "stag", "stage", "staged", "--staged", NULL};
-const char *commit_add_vars[] = {"a", "A", "ad", "add", NULL};
-const char *commit_message_vars[] = {"m", "M", "ms", "msg", NULL};
-const char *push_upstream_vars[] = {"u", "U", "up", "ups", "upst", "upstr", "upstre", "upstrea", "upstream", "--set-upstream", NULL};
+const char *staged_vars[] = {"s", "S", "st", "sta", "stag", "stage", "staged", "--staged", NULL};
+//const char *add_vars[] = {"a", "A", "ad", "add", NULL};
+const char *message_vars[] = {"m", "M", "ms", "msg", NULL};
+const char *upstream_vars[] = {"u", "U", "up", "ups", "upst", "upstr", "upstre", "upstrea", "upstream", "--set-upstream", NULL};
+const char *rebase_vars[] = {"r", "R", "re", "reb", "reba", "rebas", "rebase", "--rebase", NULL};
+const char *oneline_vars[] = {"o", "O", "on", "one", "onel", "oneli", "onelin", "oneline", "--oneline", NULL};
+const char *number_vars[] = {"n", "N", "nu", "num", "numb", "numbe", "number", "-n", NULL};
+const char *pop_vars[] = {"p", "P", "po", "pop", "pp", NULL};
+const char *list_vars[] = {"l", "L", "li", "lis", "list", "ls", NULL};
+const char *delete_vars[] = {"d", "D", "de", "del", "dele", "delet", "delete", "-d", NULL};
+const char *create_vars[] = {"c", "C", "cr", "cre", "crea", "creat", "create", NULL};
+const char *soft_vars[] = {"s", "S", "so", "sof", "soft", "--soft", NULL};
+const char *mixed_vars[] = {"m", "M", "mi", "mix", "mixe", "mixed", "--mixed", NULL};
+const char *hard_vars[] = {"h", "H", "ha", "har", "hard", "--hard", NULL};
+const char *get_url_vars[] = {"g", "G", "gu", "Gu", "GU", "gU", "ge", "get", "get-", "get-u", "get-ur", "get-url", NULL};
+const char *github_link_vars[] = {"gh/", "Gh/", "gH/", "GH/", "gi/", "git/", "gith/", "githu/", "github/", NULL};
 
 int matches(const char *cmd, const char *list[]);
 void usage();
@@ -51,8 +75,8 @@ int main(int argc, char **argv) {
      *  else if (another n. of argc)
      *  — options with that other n. of argc
      *  and so on and so forth.
-     *  sorry but this is the best implementation
-     *  you'll get out of an eepy ass at almost 2AM
+     *  sorry but this is the best implementation that
+     *  you'll get out of an eepy ass at almost 2AM, luv
      */
     if (argc == 2) {                                       // g x
         strcpy(strn1, argv[1]);
@@ -109,7 +133,7 @@ int main(int argc, char **argv) {
                 system("git init");
                 return 0;
             } else if (strlen(strn2) > 0) {
-                char command_buffer[4096] = "git init ";
+                char command_buffer[8192] = "git init ";
                 strcat(command_buffer, strn2); // TODO: use snprintf or anything safer than strcat()
                 system(command_buffer); // git init [path]
                 return 0;
@@ -119,13 +143,13 @@ int main(int argc, char **argv) {
                 system("git diff");
                 return 0;
             } else if (strlen(strn2) > 0) {
-                if (matches(strn2, diff_staged_vars) == 0) {
+                if (matches(strn2, staged_vars) == 0) {
                     system("git diff --staged");
                     return 0;
                 } else {
-                    printf(":: %sunknown%s option for '%sd%s': %s%s%s\n", red, def, red, def, red, strn2, def);
-                    printf(":: running '%sgit diff --staged%s'\n", red, def);
-                    system("git diff --staged");
+                    printf(":: %sunknown%s option for '%sdiff%s': \"%s%s%s\".\n", red, def, red, def, red, strn2, def);
+                    printf(":: running '%sgit diff%s'.\n", red, def);
+                    system("git diff");
                     return 0;
                 }
             }
@@ -134,17 +158,19 @@ int main(int argc, char **argv) {
                 system("git commit");
                 return 0;
             } else if (strlen(strn2) > 0) {
-                if (matches(strn2, commit_add_vars) == 0) {
+                if (matches(strn2, add_vars) == 0) {
                     system("git commit -a");
                     return 0;
-                } // the commit_message_vars check is in the argc == 4, because it demands another argument too
-            }
+                } // the commit_message_vars check is in the argc == 4,
+            }     // because it demands another argument too
+                  // this obviosuly applies to every command with `-m`
+                  // i.e. `git tag`
         } else if (matches(strn1, fetch_vars) == 0) {
             if (strlen(strn2) == 0) {
                 system("git fetch");
                 return 0;
             } else if (strlen(strn2) > 0) {
-                char command_buffer[4096] = "git fetch ";
+                char command_buffer[8192] = "git fetch ";
                 strcat(command_buffer, strn2);
                 system(command_buffer); // git fetch [remote]
                 return 0;
@@ -154,7 +180,7 @@ int main(int argc, char **argv) {
                 system("git merge");
                 return 0;
             } else if (strlen(strn2) > 0) {
-                char command_buffer[4096] = "git merge ";
+                char command_buffer[8192] = "git merge ";
                 strcat(command_buffer, strn2);
                 system(command_buffer); // git merge [branch]
                 return 0;
@@ -164,13 +190,77 @@ int main(int argc, char **argv) {
                 system("git push");
                 return 0;
             } else if (strlen(strn2) > 0) {
-                if (matches(strn2, push_upstream_vars) == 0) {
+                if (matches(strn2, upstream_vars) == 0) {
                     system("git push --upstream");
-                    return 0;
+                           return 0;
                 } else {
-                    char command_buffer[4096] = "git push ";
+                    char command_buffer[8192] = "git push ";
                     strcat(command_buffer, strn2);
                     system(command_buffer); // git push [remote]
+                    return 0;
+                }
+            }
+        } else if (matches(strn1, pull_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                system("git pull");
+                return 0;
+            } else if (strlen(strn2) > 0) {
+                if (matches(strn2, rebase_vars)) {
+                    system("git pull --rebase");
+                    return 0;
+                } else {
+                    printf(":: %sunknown%s option for '%spull%s': \"%s%s%s\".\n", red, def, red, def, red, strn2, def);
+                    printf(":: running '%sgit pull --rebase%s'.\n", red, def);
+                    system("git pull");
+                   return 0;
+                }
+            }
+        } else if (matches(strn1, log_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                system("git log");
+                return 0;
+            } else if (strlen(strn2) > 0) {
+                if (matches(strn2, oneline_vars) == 0) {
+                    system("git tag --oneline");
+                    return 0;
+                } else {
+                    printf(":: %sunknown%s option for '%stag%s': \"%s%s%s\".\n", red, def, red, def, red, strn2, def);
+                    printf(":: running '%sgit tag%s'.\n", red, def);
+                    system("git tag");
+                    return 0;
+                }
+            }
+        } else if (matches(strn1, stash_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                system("git stash");
+                return 0;
+            } else if (strlen(strn2) > 0) {
+                if (matches(strn2, pop_vars) == 0) {
+                    system("git stash pop");
+                    return 0;
+                } else if (matches(strn2, list_vars) == 0) {
+                    system("git stash list");
+                } else {
+                    printf(":: %sunknown%s option for '%sstash%s': \"%s%s%s\".\n", red, def, red, def, red, strn2, def);
+                    printf(":: running '%sgit stash%s'.\n", red, def);
+                    system("git stash");
+                    return 0;
+                }
+            }
+        } else if (matches(strn1, clone_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                system("git clone");
+                return 0;
+            } else if (strlen(strn2) > 0) {
+                if (matches(strn2, github_link_vars) == 0) {
+                    char command_buffer[8192] = "git clone https://github.com/";
+                    strcat(command_buffer, strn2);
+                    system(command_buffer); // git clone https://github.com/{user}/{repo}[.git]
+                    return 0;
+                } else {
+                    char command_buffer[8192] = "git clone ";
+                    strcat(command_buffer, strn2);
+                    system(command_buffer); // git clone {url}
                     return 0;
                 }
             }
@@ -214,6 +304,7 @@ void usage() {
        "g %sh%s                            -> prints this usage screen\n"
        "==============================================================\n"
        "g %sg%s {url} [folder]             -> git %sc%slone {url} [folder]\n"
+       "g %sg gh/{username}/{git}[.git]%s             -> git clone https://github.com/{user}/{repo}[.git]\n"
        "g %sa%s {file | a}                 -> git %sa%sdd {file | -A}\n"
        "g %sb%s [d] {name}                 -> git %sb%sranch [-d] {name}\n"
        "g %ssw%s [c] {branch}              -> git %ssw%sitch [-c] {branch}\n"
@@ -224,6 +315,7 @@ void usage() {
        "g %sr%s {a{name{url}}|g{name}}     -> git %sr%semote {add{name{url}}|get-url{name}}\n"
        "g %ssh%s {commit}                  -> git %ssh%sow {commit}\n"
        "g %st%s [a] {name} [m {\"msg\"}]     -> git %st%sag [-a] {name} [-m {\"msg\"}]\n"
+       "g %srm%s {file}                    -> git %srm%s {file}\n"
         , red, def, red, def
         , red, version_number, def
         , red, def
@@ -251,6 +343,8 @@ void usage() {
         , red, def, red, def, red, def 
         , red, def, red, def, red, def 
         , red, def, red, def
+        , red, def, red, def
+        , red, def
     );
 }
 
