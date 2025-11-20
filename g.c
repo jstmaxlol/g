@@ -44,7 +44,7 @@ const char *reset_vars[] = {"rt", "Rt", "rT", "RT", "rese", "reset", NULL}; // e
 const char *revert_vars[] = {"rv", "Rv", "rV", "RV", "re", "rev", "reve", "rever", "revert", NULL};
 const char *remote_vars[] = {"r", "R", "r", "rem", "remo", "remot", "remote", NULL}; // excluded "re"
 const char *show_vars[] = {"sh", "Sh", "sH", "SH", "sho", "show", NULL};
-const char *rm_vars[] = {"rm", "Rm", "rM", "RM", "remov", "remove", NULL}; // excluded "re", "rem" and "remo"
+const char *remove_vars[] = {"rm", "Rm", "rM", "RM", "remov", "remove", NULL}; // excluded "re", "rem" and "remo"
 const char *tag_vars[] = {"t", "T", "ta", "tag", NULL};
 
 const char *staged_vars[] = {"s", "S", "st", "sta", "stag", "stage", "staged", "--staged", NULL};
@@ -63,6 +63,7 @@ const char *mixed_vars[] = {"m", "M", "mi", "mix", "mixe", "mixed", "--mixed", N
 const char *hard_vars[] = {"h", "H", "ha", "har", "hard", "--hard", NULL};
 const char *get_url_vars[] = {"g", "G", "gu", "Gu", "GU", "gU", "ge", "get", "get-", "get-u", "get-ur", "get-url", NULL};
 const char *all_vars[] = {"a", "A", "al", "all", "--all", "-A", NULL};
+const char *annotated_vars[] = {"a", "A", "an", "ann", "anno", "annot", "annota", "annotat", "annotate", "annotated", "-a", NULL};
 const char *github_link_vars[] = {"gh/", "Gh/", "gH/", "GH/", "gi/", "git/", "gith/", "githu/", "github/", NULL};
 
 const char *yes_vars[] = {"y", "Y", "ye", "yes", "Yes", "YES", NULL};
@@ -123,6 +124,11 @@ int main(int argc, char **argv) {
         }
         else if (matches(strn1, stash_vars) == 0) {
             system("git stash");
+            return 0;
+        }
+        else if (matches(strn1, tag_vars) == 0) {
+            system("git tag");
+            return 0;
         }
         else if (matches(strn1, help_vars) == 0) {
             usage();
@@ -288,15 +294,67 @@ int main(int argc, char **argv) {
                     return 0;
                 }
             }
-        } else if (matches(strn1, branch_vars) == 0) {
+        } else if (matches(strn1, checkout_vars) == 0) {
             if (strlen(strn2) == 0) {
-                //
+                printf(":: %sno option%s was given for %scheckout%s\n", red, def, red, def);
+                printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
+                system("git checkout");
+                return 1;
             } else if (strlen(strn2) > 0) {
-                //
+                char command_buffer[8192] = "git checkout ";
+                strcat(command_buffer, strn2);
+                system(command_buffer); // git checkout {commit}
+                return 0;
+            }
+        } else if (matches(strn1, revert_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                printf(":: %sno option%s was given for %srevert%s\n", red, def, red, def);
+                printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
+                system("git revert");
+                return 1;
+            } else if (strlen(strn2) > 0) {
+                char command_buffer[8192] = "git revert ";
+                strcat(command_buffer, strn2);
+                system(command_buffer); // git revert {commit}
+                return 0;
+            }
+        } else if (matches(strn1, show_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                printf(":: %sno option%s was given for %sshow%s\n", red, def, red, def);
+                printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
+                system("git show");
+                return 1;
+            } else if (strlen(strn2) > 0) {
+                char command_buffer[8192] = "git show ";
+                strcat(command_buffer, strn2);
+                system(command_buffer); // git show {commit}
+                return 0;
+            }
+        } else if (matches(strn1, tag_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                system("git tag");
+                return 0;
+            } else if (strlen(strn2) > 0) {
+                char command_buffer[8192] = "git tag ";
+                strcat(command_buffer, strn2);
+                system(command_buffer); // git tag [name]
+                return 0;
+            }
+        } else if (matches(strn1, remove_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                printf(":: %sno option%s was given for %sshow%s\n", red, def, red, def);
+                printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
+                system("git rm");
+                return 1;
+            } else if (strlen(strn2) > 0) {
+                char command_buffer[8192] = "git rm ";
+                strcat(command_buffer, strn2);
+                system(command_buffer); // git rm {file}
+                return 0;
             }
         }
     }
-
+    
     usage();
     return 0;
 }
@@ -334,7 +392,7 @@ void usage() {
        "g %sh%s                            -> prints this usage screen\n"
        "==============================================================\n"
        "g %sg%s {url} [folder]             -> git %sc%slone {url} [folder]\n"
-       "g %sg gh/{username}/{git}[.git]%s             -> git clone https://github.com/{user}/{repo}[.git]\n"
+       "g %sg gh/{username}/{git}[.git]%s  -> git clone https://github.com/{user}/{repo}[.git]\n"
        "g %sa%s {file | a}                 -> git %sa%sdd {file | -A}\n"
        "g %sb%s [d] {name}                 -> git %sb%sranch [-d] {name}\n"
        "g %ssw%s [c] {branch}              -> git %ssw%sitch [-c] {branch}\n"
