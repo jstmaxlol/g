@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # compile g
-if gcc g.c -o g -O3 -Wall -Wextra -pedantic; then
+if gcc g.c -o g -O1 -Wall -Wextra -pedantic; then
     # move to PATH
     if sudo cp ./g /usr/bin/g; then
         # remove binary from local repo

@@ -13,7 +13,7 @@
 //                             mm  -> month
 //                             dd  -> day
 //                             vvv -> continous version number
-const char version_number[] = "11-20.001";
+const char version_number[] = "11-20.001 <β!>";
 
 const char red[] = "\033[31m";
 const char def[] = "\033[0m";
@@ -62,7 +62,11 @@ const char *soft_vars[] = {"s", "S", "so", "sof", "soft", "--soft", NULL};
 const char *mixed_vars[] = {"m", "M", "mi", "mix", "mixe", "mixed", "--mixed", NULL};
 const char *hard_vars[] = {"h", "H", "ha", "har", "hard", "--hard", NULL};
 const char *get_url_vars[] = {"g", "G", "gu", "Gu", "GU", "gU", "ge", "get", "get-", "get-u", "get-ur", "get-url", NULL};
+const char *all_vars[] = {"a", "A", "al", "all", "--all", "-A", NULL};
 const char *github_link_vars[] = {"gh/", "Gh/", "gH/", "GH/", "gi/", "git/", "gith/", "githu/", "github/", NULL};
+
+const char *yes_vars[] = {"y", "Y", "ye", "yes", "Yes", "YES", NULL};
+const char *no_vars[] = {"n", "N", "no", "No", "NO", NULL};
 
 int matches(const char *cmd, const char *list[]);
 void usage();
@@ -263,6 +267,32 @@ int main(int argc, char **argv) {
                     system(command_buffer); // git clone {url}
                     return 0;
                 }
+            }
+        } else if (matches(strn1, add_vars) == 0) {
+            char dym1[] = "y";
+            if (strlen(strn2) == 0) {
+                printf(":: %sno option%s was given for %sadd%s\n", red, def, red, def);
+                printf(":: did you mean \"g a .\"? (Y|y/N|n - Default: y)\n:: ");
+                scanf("%s", dym1);
+                if (matches(dym1, yes_vars) == 0 || strcmp(dym1, "\n") == 0) {
+                    system("git add .");
+                }
+            } else if (strlen(strn2) > 0) {
+                if (matches(strn2, all_vars) == 0) {
+                    system("git add -A");
+                    return 0;
+                } else {
+                    char command_buffer[8192] = "git add ";
+                    strcat(command_buffer, strn2);
+                    system(command_buffer); // git add {file}
+                    return 0;
+                }
+            }
+        } else if (matches(strn1, branch_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                //
+            } else if (strlen(strn2) > 0) {
+                //
             }
         }
     }
