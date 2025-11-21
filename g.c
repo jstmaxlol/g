@@ -68,8 +68,10 @@ const char *github_link_vars[] = {"gh/", "Gh/", "gH/", "GH/", "gi/", "git/", "gi
 
 const char *yes_vars[] = {"y", "Y", "ye", "yes", "Yes", "YES", NULL};
 const char *no_vars[] = {"n", "N", "no", "No", "NO", NULL};
+const char space[] = " ";
 
 int matches(const char *cmd, const char *list[]);
+void spaceStrings(char *fir_str, char *sec_str);
 void usage();
 
 int main(int argc, char **argv) {
@@ -157,9 +159,9 @@ int main(int argc, char **argv) {
                     system("git diff --staged");
                     return 0;
                 } else {
-                    printf(":: %sunknown%s option for '%sdiff%s': \"%s%s%s\".\n", red, def, red, def, red, strn2, def);
-                    printf(":: running '%sgit diff%s'.\n", red, def);
-                    system("git diff");
+                    char command_buffer[8192] = "git diff ";
+                    strcat(command_buffer, strn2);
+                    system("git diff"); // git diff commit
                     return 0;
                 }
             }
@@ -335,7 +337,7 @@ int main(int argc, char **argv) {
                 system("git tag");
                 return 0;
             } else if (strlen(strn2) > 0) {
-                char command_buffer[8192] = "git tag ";
+              char command_buffer[8192] = "git tag ";
                 strcat(command_buffer, strn2);
                 system(command_buffer); // git tag [name]
                 return 0;
@@ -353,6 +355,56 @@ int main(int argc, char **argv) {
                 return 0;
             }
         }
+    } else if (argc == 4) {                                // g x y z
+        strcpy(strn1, argv[1]);
+        strcpy(strn2, argv[2]);
+        strcpy(strn3, argv[3]);
+
+        if (matches(strn1, diff_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                printf(":: %sno option%s was given for %sdiff%s\n", red, def, red, def);
+                printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
+                system("git diff");
+                return 1;
+            } else if (strlen(strn2) > 0) {
+                if (matches(strn2, staged_vars) == 0) {
+                    system("git diff --staged");
+                    return 0;
+                } else {
+                    if (strlen(strn3) == 0) {
+                        printf(":: %sno option%s was given for %sdiff%s\n", red, def, red, def);
+                        printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
+                        system("git diff");
+                        return 1;
+                    } else if (strlen(strn3) > 0) {
+                        char command_buffer[8192] = "git diff ";
+                        spaceStrings(strn2, strn3); // "strn2 strn3"
+                        strcat(command_buffer, strn2);
+                        system(command_buffer); // git diff commit1 commit2
+                        return 0;
+                    }
+                }
+            }
+        } else if (matches(strn1, commit_vars) == 0) {
+            if (strlen(strn2) == 0) {
+                //
+            } else if (strlen(strn2) > 0) {
+                //
+            }
+            if (matches(strn2, message_vars) == 0) {
+                if (strlen(strn3) == 0) {
+                    //
+                } else if (strlen(strn3) > 0) {
+                    //
+                }
+            } else if (matches(strn2, add_vars) == 0) {
+                if (strlen(strn3) == 0) {
+                    //
+                } else if (strlen(strn3) > 0) {
+                    //
+                }
+            }
+        }
     }
     
     usage();
@@ -368,6 +420,10 @@ int matches(const char *cmd, const char *list[]) {
     return 1;
 }
 
+void spaceStrings(char *fir_str, char *sec_str) {
+    strcat(fir_str, space);
+    strcat(sec_str, fir_str);
+}
 
 void usage() {
     printf(
