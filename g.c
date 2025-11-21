@@ -13,7 +13,7 @@
 //                             mm  -> month
 //                             dd  -> day
 //                             vvv -> continous version number
-const char version_number[] = "11-20.001 <β!>";
+const char version_number[] = "β 11-20.001";
 
 const char red[] = "\033[31m";
 const char def[] = "\033[0m";
