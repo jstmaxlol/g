@@ -18,7 +18,7 @@ for example, all of these are valid commands to say "`git commit -a -m "hi"`"
 
 ## get `g`
 to get `g` you can either build it yourself or you \
-can install the [AUR package `getg`](https://aur.archlinux.org/packages/getg).
+can install the [AUR](https://aur.archlinux.org/packages/getg) package `getg`.
 
 &nbsp;
 ###### maintainers list
