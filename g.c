@@ -387,21 +387,26 @@ int main(int argc, char **argv) {
             }
         } else if (matches(strn1, commit_vars) == 0) {
             if (strlen(strn2) == 0) {
-                //
+                system("git commit");
+                return 0;
             } else if (strlen(strn2) > 0) {
-                //
-            }
-            if (matches(strn2, message_vars) == 0) {
-                if (strlen(strn3) == 0) {
-                    //
-                } else if (strlen(strn3) > 0) {
-                    //
-                }
-            } else if (matches(strn2, add_vars) == 0) {
-                if (strlen(strn3) == 0) {
-                    //
-                } else if (strlen(strn3) > 0) {
-                    //
+                if (matches(strn2, message_vars) == 0) {
+                    if (strlen(strn3) == 0) {
+                        //
+                    } else if (strlen(strn3) > 0) {
+                        char command_buffer[8192] = "git commit -m \"";
+                        char command_buffer_post[] = "\"";
+                        strcat(command_buffer, strn3); // git commit -m "msg
+                        strcat(command_buffer, command_buffer_post);
+                        system(command_buffer); // git commit -m "msg"
+                        return 0;
+                    }
+                } else if (matches(strn2, add_vars) == 0) {
+                    if (strlen(strn3) == 0) {
+                        //
+                    } else if (strlen(strn3) > 0) {
+                        //
+                    }
                 }
             }
         }
