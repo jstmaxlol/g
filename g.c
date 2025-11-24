@@ -68,10 +68,8 @@ const char *github_link_vars[] = {"gh/", "Gh/", "gH/", "GH/", "gi/", "git/", "gi
 
 const char *yes_vars[] = {"y", "Y", "ye", "yes", "Yes", "YES", NULL};
 const char *no_vars[] = {"n", "N", "no", "No", "NO", NULL};
-const char space[] = " ";
 
 int matches(const char *cmd, const char *list[]);
-void spaceStrings(char *fir_str, char *sec_str);
 void usage();
 
 int main(int argc, char **argv) {
@@ -145,8 +143,8 @@ int main(int argc, char **argv) {
                 system("git init");
                 return 0;
             } else if (strlen(strn2) > 0) {
-                char command_buffer[8192] = "git init ";
-                strcat(command_buffer, strn2); // TODO: use snprintf or anything safer than strcat()
+                char command_buffer[8192];
+                snprintf(command_buffer, sizeof(command_buffer), "git init %s", strn2);
                 system(command_buffer); // git init [path]
                 return 0;
             }
@@ -159,9 +157,9 @@ int main(int argc, char **argv) {
                     system("git diff --staged");
                     return 0;
                 } else {
-                    char command_buffer[8192] = "git diff ";
-                    strcat(command_buffer, strn2);
-                    system("git diff"); // git diff commit
+                    char command_buffer[8192];
+                    snprintf(command_buffer, sizeof(command_buffer), "git diff %s", strn2);
+                    system(command_buffer); // git diff commit
                     return 0;
                 }
             }
@@ -182,8 +180,8 @@ int main(int argc, char **argv) {
                 system("git fetch");
                 return 0;
             } else if (strlen(strn2) > 0) {
-                char command_buffer[8192] = "git fetch ";
-                strcat(command_buffer, strn2);
+                char command_buffer[8192];
+                snprintf(command_buffer, sizeof(command_buffer), "git fetch %s", strn2);
                 system(command_buffer); // git fetch [remote]
                 return 0;
             }
@@ -192,8 +190,8 @@ int main(int argc, char **argv) {
                 system("git merge");
                 return 0;
             } else if (strlen(strn2) > 0) {
-                char command_buffer[8192] = "git merge ";
-                strcat(command_buffer, strn2);
+                char command_buffer[8192];
+                snprintf(command_buffer, sizeof(command_buffer), "git merge %s", strn2);
                 system(command_buffer); // git merge [branch]
                 return 0;
             }
@@ -206,8 +204,8 @@ int main(int argc, char **argv) {
                     system("git push --upstream");
                            return 0;
                 } else {
-                    char command_buffer[8192] = "git push ";
-                    strcat(command_buffer, strn2);
+                    char command_buffer[8192];
+                    snprintf(command_buffer, sizeof(command_buffer), "git push %s", strn2);
                     system(command_buffer); // git push [remote]
                     return 0;
                 }
@@ -222,7 +220,7 @@ int main(int argc, char **argv) {
                     return 0;
                 } else {
                     printf(":: %sunknown%s option for '%spull%s': \"%s%s%s\".\n", red, def, red, def, red, strn2, def);
-                    printf(":: running '%sgit pull --rebase%s'.\n", red, def);
+                    printf(":: running '%sgit pull%s'.\n", red, def);
                     system("git pull");
                    return 0;
                 }
@@ -265,13 +263,13 @@ int main(int argc, char **argv) {
                 return 0;
             } else if (strlen(strn2) > 0) {
                 if (matches(strn2, github_link_vars) == 0) {
-                    char command_buffer[8192] = "git clone https://github.com/";
-                    strcat(command_buffer, strn2);
-                    system(command_buffer); // git clone https://github.com/{user}/{repo}[.git]
+                    char command_buffer[8192];
+                    snprintf(command_buffer, sizeof(command_buffer), "git clone git@github.com:%s.git", strn2);
+                    system(command_buffer); // git clone git@github.com:{user}/{repo}.git
                     return 0;
                 } else {
-                    char command_buffer[8192] = "git clone ";
-                    strcat(command_buffer, strn2);
+                    char command_buffer[8192];
+                    snprintf(command_buffer, sizeof(command_buffer), "git clone %s", strn2);
                     system(command_buffer); // git clone {url}
                     return 0;
                 }
@@ -290,45 +288,39 @@ int main(int argc, char **argv) {
                     system("git add -A");
                     return 0;
                 } else {
-                    char command_buffer[8192] = "git add ";
-                    strcat(command_buffer, strn2);
+                    char command_buffer[8192];
+                    snprintf(command_buffer, sizeof(command_buffer), "git add %s", strn2);
                     system(command_buffer); // git add {file}
                     return 0;
                 }
             }
         } else if (matches(strn1, checkout_vars) == 0) {
             if (strlen(strn2) == 0) {
-                printf(":: %sno option%s was given for %scheckout%s\n", red, def, red, def);
-                printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
                 system("git checkout");
                 return 1;
             } else if (strlen(strn2) > 0) {
-                char command_buffer[8192] = "git checkout ";
-                strcat(command_buffer, strn2);
+                char command_buffer[8192];
+                snprintf(command_buffer, sizeof(command_buffer), "git checkout %s", strn2);
                 system(command_buffer); // git checkout {commit}
                 return 0;
             }
         } else if (matches(strn1, revert_vars) == 0) {
             if (strlen(strn2) == 0) {
-                printf(":: %sno option%s was given for %srevert%s\n", red, def, red, def);
-                printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
                 system("git revert");
                 return 1;
             } else if (strlen(strn2) > 0) {
-                char command_buffer[8192] = "git revert ";
-                strcat(command_buffer, strn2);
+                char command_buffer[8192];
+                snprintf(command_buffer, sizeof(command_buffer), "git revert %s", strn2);
                 system(command_buffer); // git revert {commit}
                 return 0;
             }
         } else if (matches(strn1, show_vars) == 0) {
             if (strlen(strn2) == 0) {
-                printf(":: %sno option%s was given for %sshow%s\n", red, def, red, def);
-                printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
                 system("git show");
                 return 1;
             } else if (strlen(strn2) > 0) {
-                char command_buffer[8192] = "git show ";
-                strcat(command_buffer, strn2);
+                char command_buffer[8192];
+                snprintf(command_buffer, sizeof(command_buffer), "git show %s", strn2);
                 system(command_buffer); // git show {commit}
                 return 0;
             }
@@ -337,20 +329,18 @@ int main(int argc, char **argv) {
                 system("git tag");
                 return 0;
             } else if (strlen(strn2) > 0) {
-              char command_buffer[8192] = "git tag ";
-                strcat(command_buffer, strn2);
+              char command_buffer[8192];
+                snprintf(command_buffer, sizeof(command_buffer), "git tag %s", strn2);
                 system(command_buffer); // git tag [name]
                 return 0;
             }
         } else if (matches(strn1, remove_vars) == 0) {
             if (strlen(strn2) == 0) {
-                printf(":: %sno option%s was given for %sshow%s\n", red, def, red, def);
-                printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
                 system("git rm");
                 return 1;
             } else if (strlen(strn2) > 0) {
-                char command_buffer[8192] = "git rm ";
-                strcat(command_buffer, strn2);
+                char command_buffer[8192];
+                snprintf(command_buffer, sizeof(command_buffer), "git rm %s", strn2);
                 system(command_buffer); // git rm {file}
                 return 0;
             }
@@ -362,8 +352,6 @@ int main(int argc, char **argv) {
 
         if (matches(strn1, diff_vars) == 0) {
             if (strlen(strn2) == 0) {
-                printf(":: %sno option%s was given for %sdiff%s\n", red, def, red, def);
-                printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
                 system("git diff");
                 return 1;
             } else if (strlen(strn2) > 0) {
@@ -372,14 +360,11 @@ int main(int argc, char **argv) {
                     return 0;
                 } else {
                     if (strlen(strn3) == 0) {
-                        printf(":: %sno option%s was given for %sdiff%s\n", red, def, red, def);
-                        printf(":: autocomplete %simpossible%s, bailing out, %ssorry%s.\n", red, def, red, def);
                         system("git diff");
                         return 1;
                     } else if (strlen(strn3) > 0) {
-                        char command_buffer[8192] = "git diff ";
-                        spaceStrings(strn2, strn3); // "strn2 strn3"
-                        strcat(command_buffer, strn2);
+                        char command_buffer[8192];
+                        snprintf(command_buffer, sizeof(command_buffer), "git diff %s %s", strn2, strn3);
                         system(command_buffer); // git diff commit1 commit2
                         return 0;
                     }
@@ -392,20 +377,31 @@ int main(int argc, char **argv) {
             } else if (strlen(strn2) > 0) {
                 if (matches(strn2, message_vars) == 0) {
                     if (strlen(strn3) == 0) {
-                        //
-                    } else if (strlen(strn3) > 0) {
-                        char command_buffer[8192] = "git commit -m \"";
-                        char command_buffer_post[] = "\"";
-                        strcat(command_buffer, strn3); // git commit -m "msg
-                        strcat(command_buffer, command_buffer_post);
-                        system(command_buffer); // git commit -m "msg"
+                        printf(":: -m requires a value\n");
+                        system("git commit -m");
                         return 0;
+                    } else if (strlen(strn3) > 0) {
+                        if (matches(strn3, add_vars) == 0) {
+                            printf(":: -m requires a value\n");
+                            system("git commit -m -a");
+                            return 0;
+                        } else {
+                            char command_buffer[8192];
+                            snprintf(command_buffer, sizeof(command_buffer), "git commit -m \"%s\"", strn2);
+                            system(command_buffer); // git commit -m "msg"
+                            return 0;
+                        }
                     }
                 } else if (matches(strn2, add_vars) == 0) {
                     if (strlen(strn3) == 0) {
-                        //
+                        system("git commit -a");
+                        return 0;
                     } else if (strlen(strn3) > 0) {
-                        //
+                        if (matches(strn3, message_vars) == 0) {
+                            printf(":: \'-m\' requires an value.\n");
+                            system("git commit -a -m");
+                            return 1;
+                        }
                     }
                 }
             }
@@ -423,11 +419,6 @@ int matches(const char *cmd, const char *list[]) {
         }
     }
     return 1;
-}
-
-void spaceStrings(char *fir_str, char *sec_str) {
-    strcat(fir_str, space);
-    strcat(sec_str, fir_str);
 }
 
 void usage() {
