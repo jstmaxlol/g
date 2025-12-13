@@ -3,7 +3,7 @@
 #include <string.h>
 
 /*
- *  g - the *wrapper* git wrapper
+ *  g - the *permissive* git wrapper
  *      $version_number
  */
 
@@ -13,7 +13,7 @@
 //                             mm  -> month
 //                             dd  -> day
 //                             vvv -> continous version number
-const char version_number[] = "β 11-20.001";
+const char version_number[] = "11-20.001β";
 
 const char red[] = "\033[31m";
 const char def[] = "\033[0m";
@@ -423,7 +423,7 @@ int matches(const char *cmd, const char *list[]) {
 
 void usage() {
     printf(
-        "%sg%s - the %spermissive%s git wrapper\n"
+        "%sg%s - the *%spermissive%s* git wrapper\n"
         "spinning version %s%s%s\n"
         "==============================================================\n"
         "generally: 'g [%sstuff%s]', got it?\n"
