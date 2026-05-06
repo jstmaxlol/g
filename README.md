@@ -7,8 +7,6 @@
 if you are as lazy as me and do not want write **looong** and **boring** commands like \
 `git commit -a -m "yo mama"`, or `git remote add origin git@github.com:torvalds/linux.git`
 
-## (!) development halted
-
 ### why "permissive"?
 `g`'s whole logic is to be "_permissive_" with its syntax making it \
 is almost fail-free, and also **very very** forgiving with its user.
