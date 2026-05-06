@@ -1,6 +1,8 @@
+> (!) development temporarily halted
+
 <img width="565" height="200" alt="g_repo-banner_565x200px" src="https://github.com/user-attachments/assets/e00173a7-23dd-464a-92aa-60fd034bc5c3" />
 
-# g — that's a short name.
+# g— that's a short name.
 `g` is a \*permissive\* [git](https://git-scm.com/) wrapper that you can use \
 if you are as lazy as me and do not want write **looong** and **boring** commands like \
 `git commit -a -m "yo mama"`, or `git remote add origin git@github.com:torvalds/linux.git`
